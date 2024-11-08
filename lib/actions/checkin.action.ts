@@ -3,6 +3,7 @@
 import { connectToDatabase } from "../mongodb/database";
 import EventCheckIn from "../mongodb/database/models/checkin.model";
 import { handleError } from "../utils";
+import { ObjectId } from "mongodb";
 
 interface CreateEventCheckInParams {
   eventId: string;
@@ -75,3 +76,72 @@ export const getCheckInsByEvent = async (eventId: string) => {
     handleError(error);
   }
 };
+
+export async function getCheckInsByEventId({
+  searchString,
+  eventId,
+}: {
+  searchString?: string;
+  eventId: string;
+}) {
+  try {
+    await connectToDatabase();
+
+    if (!eventId) throw new Error("Event ID is required");
+    const eventObjectId = new ObjectId(eventId);
+
+    const checkIns = await EventCheckIn.aggregate([
+      {
+        $match: { event: eventObjectId },
+      },
+      {
+        $lookup: {
+          from: "events",
+          localField: "event",
+          foreignField: "_id",
+          as: "eventDetails",
+        },
+      },
+      {
+        $unwind: "$eventDetails",
+      },
+      {
+        $unwind: "$checkedInUsers",
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "checkedInUsers.userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: "$user",
+      },
+      {
+        $project: {
+          _id: 1,
+          eventId: "$eventDetails._id",
+          eventTitle: "$eventDetails.title",
+          eventDate: "$eventDetails.date", // assuming `date` exists in the event schema
+          checkedInUser: {
+            userId: "$user._id",
+            fullName: { $concat: ["$user.firstName", " ", "$user.lastName"] },
+            checkInTime: "$checkedInUsers.checkInTime",
+          },
+        },
+      },
+      {
+        $match: {
+          "checkedInUser.fullName": { $regex: RegExp(searchString || "", "i") },
+        },
+      },
+    ]);
+
+    return JSON.parse(JSON.stringify(checkIns));
+  } catch (error) {
+    console.error("Error fetching check-ins:", error);
+    throw error;
+  }
+}

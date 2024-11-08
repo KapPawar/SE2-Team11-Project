@@ -19,7 +19,7 @@ const Comments = ({ id, userId }: { id: string; userId: string }) => {
   const [newComment, setNewComment] = useState("");
 
   const { user } = useUser();
-  console.log(user);
+  // console.log(user);
   useEffect(() => {
     // Fetch and sort comments when the component loads
     const fetchComments = async () => {

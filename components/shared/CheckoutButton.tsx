@@ -71,6 +71,7 @@ const CheckoutButton = ({
             {!isEventCreator &&
               event.type == "1" &&
               hasOrdered &&
+              inProgress() &&
               (checkedIn ? (
                 <p className="font-semibold">
                   You have successfully checked in for this event.
@@ -81,7 +82,17 @@ const CheckoutButton = ({
                 </Button>
               ))}
 
-            {isEventCreator && event.type === "1" && (
+            {!isEventCreator &&
+              event.type == "1" &&
+              hasOrdered &&
+              !inProgress() && (
+                <p className="font-semibold">
+                  You have registered for this event. Please check in when the
+                  event starts.
+                </p>
+              )}
+
+            {isEventCreator && event.type === "1" && inProgress() && (
               <div className="flex flex-col gap-5">
                 <p className="font-semibold">
                   Event is in progress. Scan the QR Code to checkin:

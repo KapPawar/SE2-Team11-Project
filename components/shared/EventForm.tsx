@@ -70,7 +70,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
     let uploadImageUrl = values.imageUrl;
     if (files.length > 0) {
-      console.log("files", files);
+      // console.log("files", files);
       const uploadedImages = await startUpload(files);
       if (!uploadedImages) {
         return;
@@ -84,7 +84,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
       if (!uploadedVideos) {
         return;
       }
-      console.log(uploadedVideos);
+      // console.log(uploadedVideos);
       uploadVideoUrl = uploadedVideos[0].url;
     }
 

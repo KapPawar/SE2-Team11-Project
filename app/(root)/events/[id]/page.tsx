@@ -39,8 +39,8 @@ const EventDetails = async ({
           <Image
             src={event.imageUrl}
             alt="hero"
-            width={1000}
-            height={1000}
+            width={900}
+            height={900}
             className="h-full min-h-[300px] object-cover object-center w-full"
           />
           <div className="flex w-full flex-col gap-8 p-5 md:p-10">
@@ -77,11 +77,12 @@ const EventDetails = async ({
                   width={32}
                   height={32}
                 />
-                <div className="p-medium-16 lg:p-regular-20 flex flex-wrap items-center">
+                <div className="p-medium-16 lg:p-regular-20 flex flex-wrap items-center gap-2">
                   <p>
                     {formatDateTime(event.startDateTime).dateOnly} -{" "}
                     {formatDateTime(event.startDateTime).timeOnly}
                   </p>
+                  <p>to</p>
                   <p>
                     {formatDateTime(event.endDateTime).dateOnly} -{" "}
                     {formatDateTime(event.endDateTime).timeOnly}

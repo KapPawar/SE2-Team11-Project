@@ -15,6 +15,8 @@ const CheckInEvent = async ({ params: { id } }: CheckInEventProps) => {
   const event = await getEventById(id);
   const { sessionClaims } = auth();
   const userId = sessionClaims?.userId as string;
+
+  // console.log(userId);
   var checkedIn = false;
   const hasOrdered = await hasOrderedEvent({ eventId: id, userId });
   //   const checkedIn = await checkInUser({ eventId: id, userId });

@@ -10,10 +10,10 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Event Manager",
+  title: "Event Grid",
   description: "An Event Management Platform",
   icons: {
-    icon: "/assets/images/logo.svg",
+    icon: "/assets/images/logo-transparent-svg.svg",
   },
 };
 

@@ -117,7 +117,6 @@ export async function getOrdersByEvent({
         },
       },
     ]);
-
     return JSON.parse(JSON.stringify(orders));
   } catch (error) {
     handleError(error);
@@ -159,6 +158,25 @@ export async function getOrdersByUser({
       data: JSON.parse(JSON.stringify(orders)),
       totalPages: Math.ceil(ordersCount / limit),
     };
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// CHECK IF USER HAS ORDERED EVENT
+export async function hasOrderedEvent({
+  eventId,
+  userId,
+}: {
+  eventId: string;
+  userId: string;
+}) {
+  try {
+    await connectToDatabase();
+
+    const order = await Order.findOne({ event: eventId, buyer: userId });
+
+    return order ? true : false;
   } catch (error) {
     handleError(error);
   }

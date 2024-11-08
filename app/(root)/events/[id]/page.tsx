@@ -1,11 +1,18 @@
+import Checkout from "@/components/shared/Checkout";
 import CheckoutButton from "@/components/shared/CheckoutButton";
 import Collection from "@/components/shared/Collection";
+import {
+  checkEventCheckIn,
+  createEventCheckIn,
+} from "@/lib/actions/checkin.action";
 import {
   getEventById,
   getRelatedEventsByCategory,
 } from "@/lib/actions/event.actions";
+import { hasOrderedEvent } from "@/lib/actions/order.actions";
 import { formatDateTime } from "@/lib/utils";
 import { SearchParamProps } from "@/types";
+import { auth } from "@clerk/nextjs";
 import Image from "next/image";
 import React from "react";
 
@@ -19,16 +26,22 @@ const EventDetails = async ({
     eventId: event._id,
     page: searchParams.page as string,
   });
+
+  const { sessionClaims } = auth();
+  const userId = sessionClaims?.userId as string;
+
+  const hasOrdered = (await hasOrderedEvent({ eventId: id, userId })) ?? false;
+
   return (
     <>
       <section className="flex justify-center bg-primary-50 bg-dotted-pattern bg-contain">
-        <div className="grid grid-cols-1 md:grid-cols-2 2xl:max-w-7xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 2xl:max-w-full">
           <Image
             src={event.imageUrl}
             alt="hero"
             width={1000}
             height={1000}
-            className="h-full min-h-[300px] object-cover object-center"
+            className="h-full min-h-[300px] object-cover object-center w-full"
           />
           <div className="flex w-full flex-col gap-8 p-5 md:p-10">
             <div className="flex flex-col gap-6">
@@ -52,7 +65,9 @@ const EventDetails = async ({
               </div>
             </div>
 
-            <CheckoutButton event={event} />
+            <CheckoutButton event={event} hasOrdered={hasOrdered} />
+
+            {/* {!hasOrdered && <Checkout event={event} userId={userId} />} */}
 
             <div className="flex flex-col gap-5">
               <div className="flex gap-2 md:gap-3">

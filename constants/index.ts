@@ -18,10 +18,12 @@ export const eventDefaultValues = {
   description: "",
   location: "",
   imageUrl: "",
+  videoUrl: "",
   startDateTime: new Date(),
   endDateTime: new Date(),
   categoryId: "",
   price: "",
   isFree: false,
   url: "",
+  type: "",
 };

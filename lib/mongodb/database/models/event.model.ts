@@ -7,11 +7,13 @@ export interface IEvent extends Document {
   location?: string;
   createdAt: Date;
   imageUrl: string;
+  videoUrl: string;
   startDateTime: Date;
   endDateTime: Date;
   price: string;
   isFree: boolean;
   url?: string;
+  type: string;
   category: { _id: string; name: string };
   organizer: { _id: string; firstName: string; lastName: string };
 }
@@ -22,11 +24,13 @@ const EventSchema = new Schema({
   location: { type: String },
   createdAt: { type: Date, default: Date.now },
   imageUrl: { type: String, required: true },
+  videoUrl: { type: String },
   startDateTime: { type: Date, default: Date.now },
   endDateTime: { type: Date, default: Date.now },
   price: { type: String },
   isFree: { type: Boolean, default: false },
   url: { type: String },
+  type: { type: String, default: "Regular" },
   category: { type: Schema.Types.ObjectId, ref: "Category" },
   organizer: { type: Schema.Types.ObjectId, ref: "User" },
 });

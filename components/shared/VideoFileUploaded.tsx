@@ -10,12 +10,12 @@ import { convertFileToUrl } from "@/lib/utils";
 
 type FileUploaderProps = {
   onFieldChange: (url: string) => void;
-  imageUrl: string;
+  videoUrl: string;
   setFiles: Dispatch<SetStateAction<File[]>>;
 };
 
-export function FileUploader({
-  imageUrl,
+export function VideoFileUploader({
+  videoUrl,
   onFieldChange,
   setFiles,
 }: FileUploaderProps) {
@@ -26,7 +26,7 @@ export function FileUploader({
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: "image/*" ? generateClientDropzoneAccept(["image/*"]) : undefined,
+    accept: "video/*" ? generateClientDropzoneAccept(["video/*"]) : undefined,
   });
 
   return (
@@ -36,15 +36,11 @@ export function FileUploader({
     >
       <input {...getInputProps()} className="cursor-pointer" />
 
-      {imageUrl ? (
+      {videoUrl ? (
         <div className="flex h-full w-full flex-1 justify-center ">
-          <img
-            src={imageUrl}
-            alt="image"
-            width={250}
-            height={250}
-            className="w-full object-cover object-center"
-          />
+          <video controls>
+            <source src={videoUrl} type="video/mp4" />
+          </video>
         </div>
       ) : (
         <div className="flex-center flex-col py-5 text-grey-500">
@@ -54,8 +50,8 @@ export function FileUploader({
             height={77}
             alt="file upload"
           />
-          <h3 className="mb-2 mt-2">Drag event title image here</h3>
-          <p className="p-medium-12 mb-4">SVG, PNG, JPG</p>
+          <h3 className="mb-2 mt-2">Drag pre-recorded video here</h3>
+          <p className="p-medium-12 mb-4">MP4</p>
           <Button type="button" className="rounded-full">
             Select from computer
           </Button>

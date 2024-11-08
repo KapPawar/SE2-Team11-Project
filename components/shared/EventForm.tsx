@@ -28,6 +28,8 @@ import { useUploadThing } from "@/lib/uploadthing";
 import { useRouter } from "next/navigation";
 import { createEvent, updateEvent } from "@/lib/actions/event.actions";
 import { IEvent } from "@/lib/mongodb/database/models/event.model";
+import TypeDropDown from "./TypeDropDown";
+import { VideoFileUploader } from "./VideoFileUploaded";
 
 type EventFormProps = {
   userId: string;
@@ -37,6 +39,9 @@ type EventFormProps = {
 };
 const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
+  const [videoFiles, setvideoFiles] = useState<File[]>([]);
+  const [meetType, setMeetType] = useState<string>("");
+
   const initialValues =
     event && type === "Update"
       ? {
@@ -46,17 +51,26 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
         }
       : eventDefaultValues;
   const router = useRouter();
-  const { startUpload } = useUploadThing("imageUploader");
+  let { startUpload } = useUploadThing("imageUploader");
+  let { startUpload: startUploadVideo } = useUploadThing("videoUploader");
+  // const { startVideoUpload } = useUploadThing("videoUploader");
   // 1. Define your form.
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: initialValues,
   });
 
+  const handleTypeChange = (value: string | void) => {
+    if (!value) return;
+    setMeetType(value);
+    form.setValue("type", value);
+  };
+
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
     let uploadImageUrl = values.imageUrl;
     if (files.length > 0) {
+      console.log("files", files);
       const uploadedImages = await startUpload(files);
       if (!uploadedImages) {
         return;
@@ -64,10 +78,24 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
       uploadImageUrl = uploadedImages[0].url;
     }
 
+    let uploadVideoUrl = values.videoUrl;
+    if (videoFiles.length > 0) {
+      const uploadedVideos = await startUploadVideo(videoFiles);
+      if (!uploadedVideos) {
+        return;
+      }
+      console.log(uploadedVideos);
+      uploadVideoUrl = uploadedVideos[0].url;
+    }
+
     if (type === "Create") {
       try {
         const newEvent = await createEvent({
-          event: { ...values, imageUrl: uploadImageUrl },
+          event: {
+            ...values,
+            imageUrl: uploadImageUrl,
+            videoUrl: uploadVideoUrl,
+          },
           userId,
           path: "/profile",
         });
@@ -88,7 +116,12 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
       try {
         const updatedEvent = await updateEvent({
           userId,
-          event: { ...values, imageUrl: uploadImageUrl, _id: eventId },
+          event: {
+            ...values,
+            imageUrl: uploadImageUrl,
+            videoUrl: uploadVideoUrl,
+            _id: eventId,
+          },
           path: `/events/${eventId}`,
         });
         if (updatedEvent) {
@@ -139,6 +172,22 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  <TypeDropDown
+                    onChangeHandler={handleTypeChange}
+                    value={field.value}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
         <div className="flex flex-col gap-5 md:fex-row">
           <FormField
@@ -173,6 +222,24 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
               </FormItem>
             )}
           />
+          {meetType === "2" && (
+            <FormField
+              control={form.control}
+              name="videoUrl"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormControl className="h-72">
+                    <VideoFileUploader
+                      onFieldChange={field.onChange}
+                      videoUrl={field.value}
+                      setFiles={setvideoFiles}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
         </div>
         <div className="flex flex-col gap-5 md:flex-row">
           <FormField
@@ -359,6 +426,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
             )}
           />
         </div>
+
         <Button
           type="submit"
           size="lg"

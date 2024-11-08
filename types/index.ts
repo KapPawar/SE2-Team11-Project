@@ -23,9 +23,11 @@ export type CreateEventParams = {
     description: string;
     location: string;
     imageUrl: string;
+    videoUrl: string;
     startDateTime: Date;
     endDateTime: Date;
     categoryId: string;
+    type: string;
     price: string;
     isFree: boolean;
     url: string;
@@ -39,11 +41,13 @@ export type UpdateEventParams = {
     _id: string;
     title: string;
     imageUrl: string;
+    videoUrl: string;
     description: string;
     location: string;
     startDateTime: Date;
     endDateTime: Date;
     categoryId: string;
+    type: string;
     price: string;
     isFree: boolean;
     url: string;
@@ -83,6 +87,7 @@ export type Event = {
   price: string;
   isFree: boolean;
   imageUrl: string;
+  videoUrl: string;
   location: string;
   startDateTime: Date;
   endDateTime: Date;

@@ -53,8 +53,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
   const router = useRouter();
   let { startUpload } = useUploadThing("imageUploader");
   let { startUpload: startUploadVideo } = useUploadThing("videoUploader");
-  // const { startVideoUpload } = useUploadThing("videoUploader");
-  // 1. Define your form.
+
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: initialValues,
@@ -66,11 +65,9 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
     form.setValue("type", value);
   };
 
-  // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
     let uploadImageUrl = values.imageUrl;
     if (files.length > 0) {
-      // console.log("files", files);
       const uploadedImages = await startUpload(files);
       if (!uploadedImages) {
         return;

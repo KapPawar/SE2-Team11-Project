@@ -19,15 +19,15 @@ const Comments = ({ id, userId }: { id: string; userId: string }) => {
   const [newComment, setNewComment] = useState("");
 
   const { user } = useUser();
-  // console.log(user);
   useEffect(() => {
     // Fetch and sort comments when the component loads
     const fetchComments = async () => {
       const eventComments = await getCommentsByEvent(id);
+      // console.log(eventComments);
       if (eventComments) {
         const sortedComments = eventComments.comments
           .map((c: any) => ({
-            userId: c.username,
+            userId: c.userName,
             text: c.comment,
             timestamp: new Date(c.commentTimeStamp),
           }))
@@ -101,7 +101,7 @@ const Comments = ({ id, userId }: { id: string; userId: string }) => {
         {comments.length > 0 ? (
           comments.map((comment, index) => (
             <li key={index} className="flex items-center gap-2">
-              <p>{user?.username}</p>
+              <p>{comment.userId}</p>
               <div className="flex items-center justify-between p-3 bg-gray-100 rounded-full shadow-sm w-full">
                 <p className="text-gray-700">{comment.text}</p>
                 <p className="text-xs text-gray-500">

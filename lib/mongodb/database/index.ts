@@ -11,9 +11,9 @@ export const connectToDatabase = async () => {
   cached.promise =
     cached.promise ||
     mongoose.connect(MONGODB_URI, {
-      // dbName: "event-manager",
       dbName: "eventgrid",
       bufferCommands: false,
+      retryWrites: false,
     });
 
   cached.conn = await cached.promise;

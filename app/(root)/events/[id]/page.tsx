@@ -14,6 +14,8 @@ import { formatDateTime } from "@/lib/utils";
 import { SearchParamProps } from "@/types";
 import { auth } from "@clerk/nextjs";
 import Image from "next/image";
+import Link from "next/link";
+import { useUrl } from "nextjs-current-url";
 import React from "react";
 
 const EventDetails = async ({

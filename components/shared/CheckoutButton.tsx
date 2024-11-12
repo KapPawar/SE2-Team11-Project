@@ -8,6 +8,14 @@ import Checkout from "./Checkout";
 import { useQRCode } from "next-qrcode";
 import { useUrl } from "nextjs-current-url";
 import { checkEventCheckIn } from "@/lib/actions/checkin.action";
+import { getReviewsByEvent } from "@/lib/actions/review.actions";
+import { IReview } from "@/lib/mongodb/database/models/review.model";
+
+type Review = {
+  event: string; // Reference to Event
+  reviews: IReview[]; // Array of reviews
+  averageRating: number; // The average rating of the event calculated
+};
 
 const CheckoutButton = ({
   event,
@@ -16,8 +24,10 @@ const CheckoutButton = ({
   event: IEvent;
   hasOrdered: boolean;
 }) => {
+  const [averageRating, setAverageRating] = useState(0);
   const qrcodeUrl = useUrl() + "/checkin";
   const videoPage = useUrl() + "/video";
+  const reviewPage = useUrl() + "/reviews";
 
   const { Canvas } = useQRCode();
 
@@ -33,6 +43,18 @@ const CheckoutButton = ({
 
   const [checkedIn, setCheckedIn] = useState(false);
   useEffect(() => {
+    // Fetch and sort reviews when the component loads
+    const fetchReviews = async () => {
+      const eventReviews = await getReviewsByEvent({ eventId: event._id });
+      if (eventReviews) {
+        setAverageRating(Math.ceil(eventReviews.averageRating));
+      }
+    };
+
+    fetchReviews();
+  }, [event._id]);
+
+  useEffect(() => {
     const isCheckedIn = async () => {
       if (event.type === "1" && hasOrdered) {
         const checkedIn = await checkEventCheckIn({
@@ -46,12 +68,20 @@ const CheckoutButton = ({
   }, [event]);
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-col items-start gap-3">
       {/* Cannot but past events */}
-      {hasEventFinished ? (
-        <p className="p-2 text-red-400">
-          Sorry, tickets are no longer available
+
+      <div className="flex items-center justify-start gap-2">
+        <p className="text-2xl text-yellow-500">
+          {"★".repeat(averageRating) + "☆".repeat(5 - averageRating)}
         </p>
+        <Link href={reviewPage} className="text-primary-500">
+          See all reviews
+        </Link>
+      </div>
+
+      {hasEventFinished ? (
+        <p className="text-red-400">Sorry, tickets are no longer available</p>
       ) : (
         <>
           {/* {inProgress() && (
